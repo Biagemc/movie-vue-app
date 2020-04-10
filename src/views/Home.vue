@@ -24,8 +24,33 @@
     <div v-bind:key="actor.id" v-for="actor in actors">
       <p>First Name: {{actor.first_name}}</p>
       <p>Last Name: {{actor.last_name}}</p>
-      <p>Age: {{actor.age}}</p>
-      <p>Known For: {{actor.known_for}}</p>
+      <button v-on:click="showActor(actor)">More Info</button>
+
+      <div v-if="currentActor === actor">
+        <p>Age: {{actor.age}}</p>
+        <p>Known For: {{actor.known_for}}</p>
+        <p>
+          <input v-model="actor.first_name" />
+        </p>
+        <p>
+          <input v-model="actor.last_name" />
+        </p>
+        <p>
+          <input v-model="actor.age" />
+        </p>
+        <p>
+          <input v-model="actor.known_for" />
+        </p>
+        <p>
+          <input v-model="actor.movie_id" />
+        </p>
+        <p>
+          <button v-on:click="updateActor(actor)">Update</button>
+        </p>
+        <p>
+          <button v-on:click="deleteActor(actor)">Delete</button>
+        </p>
+      </div>
       <hr />
     </div>
   </div>
@@ -47,6 +72,7 @@ export default {
       newActorAge: "",
       newActorKnownFor: "",
       newActorMovieId: "",
+      currentActor: "",
     };
   },
   created: function() {
@@ -71,6 +97,29 @@ export default {
         this.newActorAge = "";
         this.newActorKnownFor = "";
         this.newActorMovieId = "";
+      });
+    },
+    showActor: function(theActor) {
+      this.currentActor = theActor;
+    },
+    updateActor: function(theActor) {
+      let params = {
+        first_name: theActor.first_name,
+        last_name: theActor.last_name,
+        age: theActor.age,
+        known_for: theActor.known_for,
+        movie_id: theActor.movie_id,
+      };
+      axios.patch("/api/actors/" + theActor.id, params).then(response => {
+        console.log("Updating actors info...");
+        this.currentActor = {};
+      });
+    },
+    deleteActor: function(theActor) {
+      axios.delete("/api/actors/" + theActor.id).then(response => {
+        console.log("Deleting actor info...");
+        let index = this.actors.indexOf(theActor);
+        this.actors.splice(index, 1);
       });
     },
   },
